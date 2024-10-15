@@ -28,21 +28,12 @@ jobs:
         working-directory: ./doc-arts-backend
         run: mvn clean verify org.jacoco:jacoco-maven-plugin:report
 
-      - name: Check Backend Coverage
-        uses: codecov/codecov-action@v3
+      - name: Upload Backend Coverage
+        uses: actions/upload-artifact@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./doc-arts-backend/target/site/jacoco/jacoco.xml
-          flags: backend
-
-      - name: Check Coverage Decrease
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./doc-arts-backend/target/site/jacoco/jacoco.xml
-          flags: backend
-          fail_ci_if_error: true
-          verbose: true
+          name: backend-coverage
+          path: ./doc-arts-backend/target/site/jacoco/jacoco.xml
+          include-hidden-files: true
 
   frontend:
     name: Build and Test Frontend
@@ -67,22 +58,54 @@ jobs:
         working-directory: ./doc-arts-ui
         run: npm test -- --coverage
 
-      - name: Check Frontend Coverage
-        uses: codecov/codecov-action@v3
+      - name: Upload Frontend Coverage
+        uses: actions/upload-artifact@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ./doc-arts-ui/coverage
-          flags: frontend
-
-      - name: Check Coverage Decrease
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ./doc-arts-ui/coverage
-          flags: frontend
-          fail_ci_if_error: true
-          verbose: true
+          name: frontend-coverage
+          path: ./doc-arts-ui/coverage/coverage-final.json
+          include-hidden-files: true
 
       - name: Build Frontend
         working-directory: ./doc-arts-ui
         run: npm run build
+
+  coverage:
+    name: Check Coverage
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download coverage reports
+        uses: actions/download-artifact@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install coverage tool
+        run: pip install coverage
+
+      - name: Combine coverage
+        run: |
+          coverage combine backend-coverage/jacoco.xml frontend-coverage/coverage-final.json
+          coverage report
+          coverage html
+
+      - name: Check coverage threshold
+        run: |
+          TOTAL_COVERAGE=$(coverage report | grep TOTAL | awk '{print $NF}' | sed 's/%//')
+          if (( $(echo "$TOTAL_COVERAGE < 80" | bc -l) )); then
+            echo "Coverage is below 80%"
+            exit 1
+          fi
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: htmlcov
+        if: failure()
