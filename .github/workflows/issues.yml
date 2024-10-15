@@ -1,0 +1,31 @@
+name: Create Issue from Project Item
+
+on:
+  project:
+    types: [created]
+
+jobs:
+  create_issue:
+    if: github.event.project_item.content_type == 'DraftIssue' # Ensure it's a draft
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Issue
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          issue-number: ${{ github.event.project_item.id }}
+          body: |
+            Creating an issue for the new project item.
+      - name: Convert Project Draft to Issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const projectItemId = context.payload.project_item.node_id;
+            await github.graphql(`
+              mutation($projectItemId: ID!) {
+                convertProjectV2DraftIssueToIssue(input: { projectId: ${{ context.payload.project_item.project_id }}, itemId: $projectItemId }) {
+                  issue {
+                    number
+                  }
+                }
+              }
+            `, { projectItemId });
