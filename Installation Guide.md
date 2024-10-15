@@ -270,7 +270,7 @@ Node.js and npm are required for running the UI application.
 2. **Navigate to the Backend Directory:**
     - Run:
       ```bash
-      cd backend
+      cd doc-arts-backend
       ```
 
 3. **Build the Project:**
@@ -293,7 +293,7 @@ Node.js and npm are required for running the UI application.
 1. **Navigate to the UI Directory:**
     - From the root directory, run:
       ```bash
-      cd ui
+      cd doc-arts-ui
       ```
 
 2. **Install Dependencies:**
