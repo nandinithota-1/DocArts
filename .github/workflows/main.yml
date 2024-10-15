@@ -107,7 +107,27 @@ jobs:
       - name: Process coverage
         run: |
           echo "Processing backend coverage:"
-          java -jar jacoco-cli.jar report coverage-reports/backend-coverage/jacoco.xml --csv backend_coverage.csv
+          python -c "
+          import xml.etree.ElementTree as ET
+          import csv
+          
+          tree = ET.parse('coverage-reports/backend-coverage/jacoco.xml')
+          root = tree.getroot()
+          
+          with open('backend_coverage.csv', 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(['File', 'Line', 'Instruction Covered', 'Instruction Total'])
+            for package in root.findall('.//package'):
+              for sourcefile in package.findall('sourcefile'):
+                filename = package.get('name') + '/' + sourcefile.get('name')
+                for line in sourcefile.findall('line'):
+                  writer.writerow([
+                    filename,
+                    line.get('nr'),
+                    line.get('ci', '0'),
+                    str(int(line.get('ci', '0')) + int(line.get('mi', '0')))
+                  ])
+          "
           
           echo "Processing frontend coverage:"
           coverage json -o frontend_coverage.json coverage-reports/frontend-coverage/coverage-final.json
@@ -117,7 +137,7 @@ jobs:
           coverage report
           coverage xml
           coverage html
-  
+      
       - name: Check coverage threshold
         run: |
           TOTAL_COVERAGE=$(coverage report | grep TOTAL | awk '{print $NF}' | sed 's/%//')
@@ -125,14 +145,14 @@ jobs:
             echo "Coverage is below 80%"
             exit 1
           fi
-  
+      
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: htmlcov
         if: always()
-  
+      
       - name: Upload XML report
         uses: actions/upload-artifact@v4
         with:
