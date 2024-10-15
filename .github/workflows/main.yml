@@ -35,6 +35,15 @@ jobs:
           files: ./doc-arts-backend/target/site/jacoco/jacoco.xml
           flags: backend
 
+      - name: Check Coverage Decrease
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./doc-arts-backend/target/site/jacoco/jacoco.xml
+          flags: backend
+          fail_ci_if_error: true
+          verbose: true
+
   frontend:
     name: Build and Test Frontend
     runs-on: ubuntu-latest
@@ -64,6 +73,15 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./doc-arts-ui/coverage
           flags: frontend
+
+      - name: Check Coverage Decrease
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./doc-arts-ui/coverage
+          flags: frontend
+          fail_ci_if_error: true
+          verbose: true
 
       - name: Build Frontend
         working-directory: ./doc-arts-ui
