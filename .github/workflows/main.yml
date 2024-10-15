@@ -73,28 +73,33 @@ jobs:
     name: Check Coverage
     needs: [backend, frontend]
     runs-on: ubuntu-latest
-
+  
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
+  
       - name: Download coverage reports
         uses: actions/download-artifact@v4
-
+        with:
+          path: coverage-reports
+  
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-
+  
       - name: Install coverage tool
         run: pip install coverage
-
+  
+      - name: List downloaded files
+        run: find coverage-reports -type f
+  
       - name: Combine coverage
         run: |
-          coverage combine backend-coverage/jacoco.xml frontend-coverage/coverage-final.json
+          coverage combine coverage-reports/backend-coverage/jacoco.xml coverage-reports/frontend-coverage/coverage-final.json
           coverage report
           coverage html
-
+  
       - name: Check coverage threshold
         run: |
           TOTAL_COVERAGE=$(coverage report | grep TOTAL | awk '{print $NF}' | sed 's/%//')
@@ -102,10 +107,10 @@ jobs:
             echo "Coverage is below 80%"
             exit 1
           fi
-
+  
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: htmlcov
-        if: failure()
+        if: always()
