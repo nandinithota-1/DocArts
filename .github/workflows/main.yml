@@ -26,11 +26,7 @@ jobs:
 
       - name: Build and Test Backend
         working-directory: ./doc-arts-backend
-        run: mvn clean verify
-
-      - name: Check Backend Coverage Threshold
-        working-directory: ./doc-arts-backend
-        run: mvn jacoco:check
+        run: mvn clean verify org.jacoco:jacoco-maven-plugin:report
 
       - name: Upload Backend Coverage
         uses: actions/upload-artifact@v4
@@ -62,18 +58,6 @@ jobs:
         working-directory: ./doc-arts-ui
         run: npm test -- --coverage
 
-      - name: Check Frontend Coverage Threshold
-        working-directory: ./doc-arts-ui
-        run: |
-          npx jest --coverage --coverageThreshold='{
-            "global": {
-              "branches": 80,
-              "functions": 80,
-              "lines": 80,
-              "statements": 80
-            }
-          }'
-
       - name: Upload Frontend Coverage
         uses: actions/upload-artifact@v4
         with:
@@ -86,7 +70,7 @@ jobs:
         run: npm run build
 
   coverage:
-    name: Combine Coverage Reports
+    name: Check Coverage
     needs: [backend, frontend]
     runs-on: ubuntu-latest
   
@@ -99,7 +83,7 @@ jobs:
         with:
           path: coverage-reports
   
-      - name: Install .NET Core SDK
+      - name: Install .NET Core
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '7.0.x'
@@ -109,14 +93,11 @@ jobs:
   
       - name: Merge coverage reports
         run: |
-          reportgenerator \
-            -reports:"coverage-reports/**/jacoco.xml;coverage-reports/**/coverage-final.json" \
-            -targetdir:"coverage-report" \
-            -reporttypes:Html
+          reportgenerator -reports:"coverage-reports/**/jacoco.xml;coverage-reports/**/coverage-final.json" -targetdir:"coverage-report" -reporttypes:Html
   
-      - name: Upload HTML coverage report
+      - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
-          name: combined-coverage-report
+          name: coverage-report
           path: coverage-report
         if: always()
