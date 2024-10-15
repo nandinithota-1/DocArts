@@ -83,6 +83,16 @@ jobs:
         with:
           path: coverage-reports
   
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+  
+      - name: Download JaCoCo CLI
+        run: |
+          wget https://repo1.maven.org/maven2/org/jacoco/org.jacoco.cli/0.8.7/org.jacoco.cli-0.8.7-nodeps.jar -O jacoco-cli.jar
+  
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -94,10 +104,18 @@ jobs:
       - name: List downloaded files
         run: find coverage-reports -type f
   
-      - name: Combine coverage
+      - name: Process coverage
         run: |
-          coverage combine coverage-reports/backend-coverage/jacoco.xml coverage-reports/frontend-coverage/coverage-final.json
+          echo "Processing backend coverage:"
+          java -jar jacoco-cli.jar report coverage-reports/backend-coverage/jacoco.xml --csv backend_coverage.csv
+          
+          echo "Processing frontend coverage:"
+          coverage json -o frontend_coverage.json coverage-reports/frontend-coverage/coverage-final.json
+          
+          echo "Combining coverage:"
+          coverage combine backend_coverage.csv frontend_coverage.json
           coverage report
+          coverage xml
           coverage html
   
       - name: Check coverage threshold
@@ -113,4 +131,11 @@ jobs:
         with:
           name: coverage-report
           path: htmlcov
+        if: always()
+  
+      - name: Upload XML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
         if: always()
