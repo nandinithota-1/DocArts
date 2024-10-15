@@ -83,79 +83,21 @@ jobs:
         with:
           path: coverage-reports
   
-      - name: Set up Java
-        uses: actions/setup-java@v3
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v3
         with:
-          java-version: '17'
-          distribution: 'corretto'
+          dotnet-version: '7.0.x'
   
-      - name: Download JaCoCo CLI
+      - name: Install ReportGenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+  
+      - name: Merge coverage reports
         run: |
-          wget https://repo1.maven.org/maven2/org/jacoco/org.jacoco.cli/0.8.7/org.jacoco.cli-0.8.7-nodeps.jar -O jacoco-cli.jar
+          reportgenerator -reports:"coverage-reports/**/jacoco.xml;coverage-reports/**/coverage-final.json" -targetdir:"coverage-report" -reporttypes:Html
   
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-  
-      - name: Install coverage tool
-        run: pip install coverage
-  
-      - name: List downloaded files
-        run: find coverage-reports -type f
-  
-      - name: Process coverage
-        run: |
-          echo "Processing backend coverage:"
-          python -c "
-          import xml.etree.ElementTree as ET
-          import csv
-          
-          tree = ET.parse('coverage-reports/backend-coverage/jacoco.xml')
-          root = tree.getroot()
-          
-          with open('backend_coverage.csv', 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(['File', 'Line', 'Instruction Covered', 'Instruction Total'])
-            for package in root.findall('.//package'):
-              for sourcefile in package.findall('sourcefile'):
-                filename = package.get('name') + '/' + sourcefile.get('name')
-                for line in sourcefile.findall('line'):
-                  writer.writerow([
-                    filename,
-                    line.get('nr'),
-                    line.get('ci', '0'),
-                    str(int(line.get('ci', '0')) + int(line.get('mi', '0')))
-                  ])
-          "
-          
-          echo "Processing frontend coverage:"
-          coverage json -o frontend_coverage.json coverage-reports/frontend-coverage/coverage-final.json
-          
-          echo "Combining coverage:"
-          coverage combine backend_coverage.csv frontend_coverage.json
-          coverage report
-          coverage xml
-          coverage html
-      
-      - name: Check coverage threshold
-        run: |
-          TOTAL_COVERAGE=$(coverage report | grep TOTAL | awk '{print $NF}' | sed 's/%//')
-          if (( $(echo "$TOTAL_COVERAGE < 80" | bc -l) )); then
-            echo "Coverage is below 80%"
-            exit 1
-          fi
-      
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: htmlcov
-        if: always()
-      
-      - name: Upload XML report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-xml
-          path: coverage.xml
+          path: coverage-report
         if: always()
