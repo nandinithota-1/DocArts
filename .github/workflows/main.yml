@@ -30,21 +30,13 @@ jobs:
 
       - name: Build and Test Backend with Coverage
         working-directory: ./doc-arts-backend
-        run: mvn clean verify jacoco:report
+        run: mvn clean verify
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v3
         with:
           name: backend-coverage-report
           path: ./doc-arts-backend/target/site/jacoco/jacoco.xml
-
-      - name: Check Coverage Decrease
-        uses: irongut/CodeCoverageDelta@v1
-        with:
-          base-coverage-files: ./coverage-base/backend-coverage.xml
-          head-coverage-files: ./doc-arts-backend/target/site/jacoco/jacoco.xml
-          coverage-type: line
-          fail-if-coverage-less-than: 0  # Fail if coverage decreases
 
   frontend:
     name: Build, Test, and Check Coverage for Frontend
@@ -77,41 +69,46 @@ jobs:
           name: frontend-coverage-report
           path: ./doc-arts-ui/coverage/clover.xml
 
-      - name: Check Coverage Decrease
-        uses: dorny/coverage-check@v2
-        with:
-          baseline-file: ./coverage-base/frontend-coverage.xml
-          coverage-file: ./doc-arts-ui/coverage/clover.xml
-          fail-under: 0  # Fail if coverage decreases
-
-      - name: Build Frontend
-        working-directory: ./doc-arts-ui
-        run: npm run build
-
-  # Download coverage reports from main branch
-  coverage_base:
-    name: Download Base Coverage Reports
+  coverage_check:
+    name: Compare Coverage and Fail on Decrease
     runs-on: ubuntu-latest
     needs: [backend, frontend]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          ref: main
-          path: coverage-base
+          fetch-depth: 0
 
-      - name: Generate Backend Coverage Report on Main
-        working-directory: ./coverage-base/doc-arts-backend
-        run: mvn clean verify jacoco:report
-
-      - name: Generate Frontend Coverage Report on Main
-        working-directory: ./coverage-base/doc-arts-ui
-        run: npm ci && npm test -- --coverage
-
-      - name: Upload Base Coverage Reports
-        uses: actions/upload-artifact@v3
+      - name: Download Backend Coverage Report
+        uses: actions/download-artifact@v3
         with:
-          name: base-coverage-reports
-          path: |
-            ./coverage-base/doc-arts-backend/target/site/jacoco/jacoco.xml
-            ./coverage-base/doc-arts-ui/coverage/clover.xml
+          name: backend-coverage-report
+          path: ./coverage-reports/backend
+
+      - name: Download Frontend Coverage Report
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-coverage-report
+          path: ./coverage-reports/frontend
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Node.js version compatible with dorny/coverage-check
+
+      - name: Run Coverage Check
+        uses: dorny/coverage-check@v2
+        with:
+          fail-on-coverage-decrease: true
+          files: |
+            backend:
+              base: ${{ github.event.pull_request.base.sha }}:doc-arts-backend/target/site/jacoco/jacoco.xml
+              head: ./coverage-reports/backend/jacoco.xml
+              path: doc-arts-backend/src/main/java
+              format: jacoco
+            frontend:
+              base: ${{ github.event.pull_request.base.sha }}:doc-arts-ui/coverage/clover.xml
+              head: ./coverage-reports/frontend/clover.xml
+              path: doc-arts-ui/src
+              format: clover
