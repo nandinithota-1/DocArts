@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {localStorageAccessToken} from "@/app/page";
 
 // Create a custom Axios instance
 const dam = axios.create({
@@ -16,9 +17,16 @@ dam.interceptors.request.use(
     (config) => {
         // Attach the token (if available) to the Authorization header
         const token = localStorage.getItem('access_token');
-        if (token) {
-            config.headers['Authorization'] = `Bearer ${token}`;
-        } else{
+        if(token){
+            const tokenObject: localStorageAccessToken = JSON.parse(token)
+            if(new Date() > new Date(tokenObject.expiresInDateTime)){
+                window.location.assign('http://localhost:3000')
+            }
+            else{
+                config.headers['Authorization'] = `Bearer ${tokenObject.token}`;
+            }
+        }
+        else{
             window.location.assign('http://localhost:3000')
         }
 

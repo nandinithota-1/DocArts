@@ -3,10 +3,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+export type localStorageAccessToken = {
+    token: string
+    expiresIn: string,
+    expiresInDateTime: number
+}
+
 export default function Home() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [authUrl, setAuthUrl] = useState<string>("");
     const [expiresIn, setExpiresIn] = useState<number | null>(null); // To track token expiration time
+    const [code, setCode] = useState("")
 
     const generateAuthUrl = () => {
         const authUrl = new URL(process.env.NEXT_PUBLIC_MEDIAVALET_AUTH_ENDPOINT! + process.env.NEXT_PUBLIC_MEDIAVALET_CONNECT!);
@@ -22,11 +29,15 @@ export default function Home() {
 
         const accessToken = localStorage.getItem('access_token');
         if (accessToken) {
-            setIsAuthenticated(true);
-        } else {
-            setIsAuthenticated(false);
+            const accessTokenObject: localStorageAccessToken = JSON.parse(accessToken);
+            if(new Date() < new Date(accessTokenObject.expiresInDateTime)){
+                setIsAuthenticated(true);
+                return;
+            }
+
         }
 
+        setIsAuthenticated(false);
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
 
@@ -37,14 +48,14 @@ export default function Home() {
 
     // Automatically redirect to login if not authenticated
     useEffect(() => {
-        if (!isAuthenticated && authUrl) {
+        if (!isAuthenticated && authUrl && !code) {
             window.location.replace(authUrl);  // Redirect the user immediately to the login page
         }
-    }, [isAuthenticated, authUrl]);
+    }, [isAuthenticated, authUrl, code]);
 
     const exchangeCodeForToken = async (code: string) => {
         const tokenEndpoint = process.env.NEXT_PUBLIC_MEDIAVALET_AUTH_ENDPOINT! + process.env.NEXT_PUBLIC_MEDIAVALET_TOKEN!;
-
+        setCode(code)
         try {
             const response = await axios.post(tokenEndpoint, new URLSearchParams({
                 grant_type: 'authorization_code',
@@ -52,16 +63,17 @@ export default function Home() {
                 client_id: process.env.NEXT_PUBLIC_MEDIAVALET_CLIENT_ID!,
                 client_secret: process.env.NEXT_PUBLIC_MEDIAVALET_CLIENT_SECRET!,
                 redirect_uri: process.env.NEXT_PUBLIC_MEDIAVALET_REDIRECT_URI!,
-            }), {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            });
+            }));
 
             const data = response.data;
 
             if (data.access_token) {
-                localStorage.setItem('access_token', data.access_token);
+                const accessTokenObject: localStorageAccessToken = {
+                    token: data.access_token,
+                    expiresIn: data.expires_in,
+                    expiresInDateTime: new Date().setSeconds(new Date().getSeconds() + (data.expires_in - 60))
+                }
+                localStorage.setItem('access_token', JSON.stringify(accessTokenObject));
                 setIsAuthenticated(true);
                 setExpiresIn(data.expires_in);
                 window.location.replace('/'); // Redirect to homepage or dashboard after successful authentication
