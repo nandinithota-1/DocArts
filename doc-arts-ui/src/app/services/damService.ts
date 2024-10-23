@@ -1,13 +1,12 @@
 import axios from "axios";
+import {localStorageAccessToken} from "@/app/page";
 
 // Create a custom Axios instance
 const damService = axios.create({
     baseURL: process.env.NEXT_PUBLIC_MEDIAVALET_BASE_URL, // Set the base URL
     timeout: 5000, // Optional timeout for requests
     headers: {
-        'Content-Type': 'application/json',
         'x-mv-api-version': '1.1', // Default MediaValet API version
-        'Accept': 'application/json', // Default accept header for JSON
     },
 });
 
@@ -16,9 +15,16 @@ damService.interceptors.request.use(
     (config) => {
         // Attach the token (if available) to the Authorization header
         const token = localStorage.getItem('access_token');
-        if (token) {
-            config.headers['Authorization'] = `Bearer ${token}`;
-        } else{
+        if(token){
+            const tokenObject: localStorageAccessToken = JSON.parse(token)
+            if(new Date() > new Date(tokenObject.expiresInDateTime)){
+                window.location.assign('http://localhost:3000')
+            }
+            else{
+                config.headers['Authorization'] = `Bearer ${tokenObject.token}`;
+            }
+        }
+        else{
             window.location.assign('http://localhost:3000')
         }
 
