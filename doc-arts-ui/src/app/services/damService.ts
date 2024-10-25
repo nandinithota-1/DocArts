@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
 import {localStorageAccessToken} from "@/app/page";
 
 // Create a custom Axios instance
@@ -46,7 +46,7 @@ damService.interceptors.request.use(
 
 // Add a response interceptor
 damService.interceptors.response.use(
-    (response) => {
+    (response: AxiosResponse<any, any>) => {
         console.log('Response received:', response);
         return response;
     },
