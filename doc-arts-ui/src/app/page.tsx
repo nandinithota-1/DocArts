@@ -1,8 +1,10 @@
 'use client'
-import React, { useEffect, useState, useRef } from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import axios from 'axios';
 import damService from "@/app/services/damService";
 import damBlobService from "@/app/services/damBlobService";
+import SearchIcon from '@mui/icons-material/Search';
+import {Button} from "@mui/material";
 
 export type localStorageAccessToken = {
     token: string;
@@ -11,13 +13,13 @@ export type localStorageAccessToken = {
 };
 
 export default function Home() {
-    const IMAGES_PER_LOAD = 30;
+    const TOTAL_IMAGES = 28;
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [authUrl, setAuthUrl] = useState<string>("");
     const [expiresIn, setExpiresIn] = useState<number | null>(null);
     const [code, setCode] = useState("");
     const [assets, setAssets] = useState<any[]>([]);
-    const [imageUrls, setImageUrls] = useState<string[]>([]); // Store image URLs
+    const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -105,48 +107,46 @@ export default function Home() {
         let assetArray = assets;
 
         try {
-            if(assetArray.length === 0){
-                // Fetch asset metadata from the damService
+            if (assetArray.length === 0) {
                 const response = await damService.get("/assets?includeSoftDeleted=false");
                 assetArray = response.data.payload.assets;
             }
 
-            // Shuffle the assets to get random images
-            assetArray = shuffleArray(assetArray);
+            // Limit the total number of assets to 30
+            assetArray = shuffleArray(assetArray).slice(0, TOTAL_IMAGES);
 
-            // Select a random subset of images
-            const images = assetArray.map((asset: any) => asset.media.small).splice(0, IMAGES_PER_LOAD);
+            // Get URLs for a subset of 30 images
+            const images = assetArray.map((asset: any) => asset.media.small);
             setAssets(assetArray);
 
-            // Fetch each image as a blob (binary data)
             const imageBlobPromises = images.map(async (image: any) => {
-                const blobResponse = await damBlobService.get(image, { responseType: "blob" });
-                return URL.createObjectURL(blobResponse.data); // Create URLs for the blobs
+                const blobResponse = await damBlobService.get(image, {responseType: "blob"});
+                return URL.createObjectURL(blobResponse.data);
             });
 
             const imageUrlsResolved = await Promise.all(imageBlobPromises);
-            setImageUrls((prevUrls) => [...prevUrls, ...imageUrlsResolved]);
+            setImageUrls(imageUrlsResolved);
         } catch (error) {
             console.error("Error fetching image data:", error);
         } finally {
             setLoading(false);
+            console.log("Assets loaded:", assets.length);
         }
     };
 
     // Helper function to shuffle an array using Fisher-Yates algorithm
     const shuffleArray = (array: any[]) => {
         for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1)); // Random index
-            [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
         }
         return array;
     };
 
-    // Infinite scroll effect to load more images when scrolling near the bottom
     useEffect(() => {
         const handleScroll = () => {
             if (containerRef.current) {
-                const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
+                const {scrollTop, scrollHeight, clientHeight} = containerRef.current;
                 if (scrollHeight - scrollTop <= clientHeight * 3 && !loading) {
                     fetchImageData(); // Load more images when the user scrolls near the bottom
                 }
@@ -165,7 +165,7 @@ export default function Home() {
     }, [loading]);
 
     return (
-        <div style={{ height: "100vh", overflow: "auto" }} ref={containerRef}>
+        <div style={{height: "100vh", overflow: "auto"}} ref={containerRef}>
             <div
                 style={{
                     display: "grid",
@@ -173,17 +173,49 @@ export default function Home() {
                     gap: "1px",
                 }}
             >
-
                 {imageUrls.length > 0 ? imageUrls.map((imageUrl, index) => (
-                    <img
-                        key={index}
-                        src={imageUrl}
-                        alt={`Image ${index}`}
-                        style={{ width: "100%", height: "auto" }}
-                    />
-                )) : <button onClick={fetchImageData}>Fetch Images</button>}
+                        <img
+                            key={index}
+                            src={imageUrl}
+                            alt={`Image ${index}`}
+                            style={{width: "100%", height: "200px", objectFit: "cover"}}
+                        />
+                    )) :
+                    <div
+                        style={{
+                            padding: "10px",
+                            width: '100vw',
+                            textAlign: "center",
+                            paddingTop: "25vh"
+                        }}
+                    >
+                        <h1>Welcome to UTD DocArts Project!{<br/>} Please click the button below to start ⬇️</h1>
+                        <Button
+                            style={{
+                                marginTop: "10px"
+                            }}
+                            variant={"contained"}
+                            onClick={fetchImageData}
+                        >
+                            Fetch Images
+                        </Button>
+                        {loading && <p>{imageUrls.length === 0 ? "Loading images..." : "Loading more images..."}</p>}
+                    </div>
+                }
             </div>
-            {loading && <p>{imageUrls.length === 0 ? "Loading images..." : "Loading more images..."}</p>}
+            <Button
+                style={{
+                    background: "white",
+                    position: "absolute",
+                    bottom: "25px",
+                    right: "25px",
+                    color: "black"
+                }}
+                startIcon={<SearchIcon/>}
+                onClick={() => {window.location.assign('/featured-albums')}}
+                variant={"contained"}>
+                Explore More
+            </Button>
         </div>
     );
 }
