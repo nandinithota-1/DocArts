@@ -13,7 +13,7 @@ export type localStorageAccessToken = {
 };
 
 export default function Home() {
-    const TOTAL_IMAGES = 28;
+    const TOTAL_IMAGES = 27;
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [authUrl, setAuthUrl] = useState<string>("");
     const [expiresIn, setExpiresIn] = useState<number | null>(null);
