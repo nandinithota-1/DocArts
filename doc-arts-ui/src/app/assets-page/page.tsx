@@ -9,22 +9,40 @@ interface SearchParams {
     id: string;
 }
 
+// Define the type for each asset
+interface Asset {
+    id: string;
+    name: string;
+    media: {
+        small: string;
+    };
+}
+
+// Define the expected structure of the API response
+interface AssetsResponse {
+    data: {
+        payload: {
+            assets: Asset[];
+        };
+    };
+}
+
 interface AssetsPageProps {
     searchParams: SearchParams;
 }
 
 const AssetsPage: FC<AssetsPageProps> = ({ searchParams }) => {
-    const { id } = searchParams; // Accessing search params directly
+    const { id } = searchParams;
     const [loading, setLoading] = useState(true);
-    const [assets, setAssets] = useState<any[]>([]);
+    const [assets, setAssets] = useState<Asset[]>([]);
 
     useEffect(() => {
         const fetchAssets = async () => {
-            if (!id) return; // Ensure id is available before making the API call
+            if (!id) return;
 
             try {
                 setLoading(true);
-                const response = await DamService.get(`categories/${id}/assets`);
+                const response = await DamService.get<AssetsResponse>(`categories/${id}/assets`);
                 setAssets(response.data.payload.assets);
             } catch (error) {
                 console.error("Error fetching assets:", error);
@@ -36,25 +54,34 @@ const AssetsPage: FC<AssetsPageProps> = ({ searchParams }) => {
         fetchAssets();
     }, [id]);
 
+    const buttonStyle: React.CSSProperties = {
+        backgroundColor: "white",
+        color: "black",
+        marginBottom: "20px",
+        padding: "10px 20px",
+        borderRadius: "5px",
+        border: "none",
+        cursor: "pointer"
+    };
+
+    const imgStyle: React.CSSProperties = {
+        width: "100%",
+        height: "250px",
+        objectFit: "cover",
+        borderRadius: "5px"
+    };
+
     return (
         <div style={{ padding: "20px", background: "black", color: "white" }}>
             <Button
                 onClick={() => window.location.assign("/featured-albums")}
-                style={{
-                    backgroundColor: "white",
-                    color: "black",
-                    marginBottom: "20px",
-                    padding: "10px 20px",
-                    borderRadius: "5px",
-                    border: "none",
-                    cursor: "pointer"
-                }}
+                style={buttonStyle}
             >
                 Back to Featured Albums
             </Button>
             {loading ? (
                 <Grid container spacing={0}>
-                    {Array(6).fill(null).map((_, index) => (
+                    {Array.from({ length: 6 }).map((_, index) => (
                         <Grid item xs={12} sm={4} key={index}>
                             <Skeleton variant="rectangular" height={200} sx={{ background: "dimgray" }} />
                         </Grid>
@@ -66,14 +93,9 @@ const AssetsPage: FC<AssetsPageProps> = ({ searchParams }) => {
                         <Grid item xs={12} sm={4} key={asset.id} style={{ padding: 0 }}>
                             <Box>
                                 <img
-                                    src={asset.media.small} // Adjust according to the actual asset structure
+                                    src={asset.media.small}
                                     alt={asset.name}
-                                    style={{
-                                        width: "100%",
-                                        height: "250px",
-                                        objectFit: "cover",
-                                        borderRadius: "5px",
-                                    }}
+                                    style={imgStyle}
                                 />
                                 <h4 style={{ color: "white" }}>{asset.name}</h4>
                             </Box>
