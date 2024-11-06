@@ -1,11 +1,19 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, FC } from "react";
 import DamService from "@/app/services/damService";
 import { Box, Button, Grid, Skeleton } from "@mui/material";
 
-// Access the search parameters from the props
-const AssetsPage = ({ searchParams }) => {
+// Define the type for searchParams
+interface SearchParams {
+    id: string;
+}
+
+interface AssetsPageProps {
+    searchParams: SearchParams;
+}
+
+const AssetsPage: FC<AssetsPageProps> = ({ searchParams }) => {
     const { id } = searchParams; // Accessing search params directly
     const [loading, setLoading] = useState(true);
     const [assets, setAssets] = useState<any[]>([]);
@@ -33,13 +41,13 @@ const AssetsPage = ({ searchParams }) => {
             <Button
                 onClick={() => window.location.assign("/featured-albums")}
                 style={{
-                    backgroundColor: "white", // White background
-                    color: "black",            // Black text color
+                    backgroundColor: "white",
+                    color: "black",
                     marginBottom: "20px",
-                    padding: "10px 20px",     // Add some padding for a better look
-                    borderRadius: "5px",       // Add some border radius for rounded corners
-                    border: "none",            // Remove any default border
-                    cursor: "pointer"          // Change cursor to pointer for better UX
+                    padding: "10px 20px",
+                    borderRadius: "5px",
+                    border: "none",
+                    cursor: "pointer"
                 }}
             >
                 Back to Featured Albums
@@ -62,8 +70,8 @@ const AssetsPage = ({ searchParams }) => {
                                     alt={asset.name}
                                     style={{
                                         width: "100%",
-                                        height: "250px", // Set a fixed height
-                                        objectFit: "cover", // Ensure the image covers the box without distortion
+                                        height: "250px",
+                                        objectFit: "cover",
                                         borderRadius: "5px",
                                     }}
                                 />
