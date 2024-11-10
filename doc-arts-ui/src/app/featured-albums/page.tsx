@@ -16,7 +16,14 @@ interface FolderObject {
     }[];
 }
 
-const handleSubfolderClick = (subFolder) => {
+interface SubFolder {
+    folderId: string;
+    folderName: string;
+    assets: any[];
+    firstImage: string;
+}
+
+const handleSubfolderClick = (subFolder: SubFolder) => {
     // Assuming the assets page is named 'assets-page.tsx'
     window.location.href = `/assets-page?id=${subFolder.folderId}`; // Change subFolder.id to subFolder.folderId
 };
