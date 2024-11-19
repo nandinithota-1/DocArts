@@ -13,3 +13,5 @@ export default async function Page({
         <AssetsPage id={id}/>
     );
 };
+
+
