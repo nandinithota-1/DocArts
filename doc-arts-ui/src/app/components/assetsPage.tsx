@@ -63,8 +63,8 @@ export const AssetsPage = ({id}: {id: string}) => {
     }, [id]);
 
     const buttonStyle: React.CSSProperties = {
-        backgroundColor: "white",
-        color: "black",
+        backgroundColor: "#577C9A",
+        color: "white",
         marginBottom: "20px",
         padding: "10px 20px",
         borderRadius: "5px",
@@ -85,7 +85,7 @@ export const AssetsPage = ({id}: {id: string}) => {
         borderRadius: "5px"
     };
     return (
-        <div style={{ padding: "20px", backgroundColor: "black", color: "white" }}>
+        <div style={{ padding: "20px", backgroundColor: "#152238", color: "white" }}>
             <Button
                 onClick={() => window.location.assign("/featured-albums")}
                 style={buttonStyle}

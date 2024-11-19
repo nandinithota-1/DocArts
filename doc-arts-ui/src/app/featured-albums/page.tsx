@@ -164,15 +164,16 @@ export default function FeaturedAlbums() {
     }
 
     return (
-        <div style={{padding: "20px", background: "black", color: "white" }}>
+        <div style={{padding: "20px", background: "#152238", color: "white" }}>
             <div style={{ display: "flex", alignItems: "center" }}>
                 <div style={{ flex: 1 }}>
                     <h1 style={{ color: "white" }}>Featured Albums</h1>
                     <h2 style={{ color: "white" }}>Select one of the following folders to view images.</h2>
                 </div>
                 <Button
-                    style={{ background: "white", color: "black", height: "40px" }}
+                    style={{ background: "#577C9A", color: "white", height: "40px",   boxShadow: "10px 10px 10px rgba(0, 0, 0, 0.4)"}}
                     onClick={() => window.location.assign("/")}
+
                 >
                     Back to art wall
                 </Button>
@@ -318,3 +319,205 @@ export default function FeaturedAlbums() {
         </div>
     );
 }
+// "use client";
+// import React, { useEffect, useState } from "react";
+// import DamService from "@/app/services/damService";
+// import {
+//     Autocomplete,
+//     Box,
+//     Button,
+//     IconButton,
+//     Skeleton,
+//     TextField,
+// } from "@mui/material";
+// import ArrowCircleLeftSharpIcon from "@mui/icons-material/ArrowCircleLeftSharp";
+// import ArrowCircleRightSharpIcon from "@mui/icons-material/ArrowCircleRightSharp";
+// import damBlobSe
+// rvice from "@/app/services/damBlobService";
+// import { AppInputBox } from "@/app/components/customTextField";
+//
+// interface FolderObject {
+//     authorName: string;
+//     subFolders: SubFolder[];
+// }
+//
+// interface SubFolder {
+//     folderId: string;
+//     folderName: string;
+//     assets: any[];
+//     firstImage: string;
+//     keywords: string[];
+// }
+//
+// const handleSubfolderClick = (subFolder: SubFolder) => {
+//     window.location.href = `/featured-albums/${subFolder.folderId}`;
+// };
+//
+// export default function FeaturedAlbums() {
+//     const [loading, setLoading] = useState(true);
+//     const [folders, setFolders] = useState<FolderObject[]>([]);
+//     const [startIndices, setStartIndices] = useState<number[]>([]);
+//     const [keywordSearch, setKeywordSearch] = useState("");
+//     const pageSize = 4;
+//
+//     const handlePrev = (index: number) => {
+//         setStartIndices((prevIndices) => {
+//             const updatedIndices = [...prevIndices];
+//             updatedIndices[index] = Math.max(0, updatedIndices[index] - pageSize);
+//             return updatedIndices;
+//         });
+//     };
+//
+//     const handleNext = (index: number, folder: FolderObject) => {
+//         setStartIndices((prevIndices) => {
+//             const updatedIndices = [...prevIndices];
+//             updatedIndices[index] = Math.min(
+//                 folder.subFolders.length - pageSize,
+//                 updatedIndices[index] + pageSize
+//             );
+//             return updatedIndices;
+//         });
+//     };
+//
+//     const fuzzySearchFolders = (
+//         folders: FolderObject[],
+//         searchTerm: string,
+//         threshold: number = 0.1
+//     ): FolderObject[] => {
+//         const search = searchTerm.toLowerCase();
+//         if (searchTerm === "") {
+//             return folders;
+//         }
+//
+//         const similarityScore = (keyword: string, search: string): number => {
+//             const maxLength = Math.max(keyword.length, search.length);
+//             let matches = 0;
+//             for (let i = 0; i < Math.min(keyword.length, search.length); i++) {
+//                 if (keyword[i] === search[i]) {
+//                     matches++;
+//                 }
+//             }
+//             return matches / maxLength;
+//         };
+//
+//         return folders
+//             .map((folder) => {
+//                 const matchingSubFolders = folder.subFolders.filter((subFolder) =>
+//                     subFolder.keywords.some(
+//                         (keyword) => similarityScore(keyword.toLowerCase(), search) >= threshold
+//                     )
+//                 );
+//                 return matchingSubFolders.length > 0
+//                     ? { ...folder, subFolders: matchingSubFolders }
+//                     : null;
+//             })
+//             .filter((folder): folder is FolderObject => folder !== null);
+//     };
+//
+//     useEffect(() => {
+//         const fetchData = async () => {
+//             try {
+//                 setLoading(true);
+//                 const resp = await DamService.get("folders/db5f8d55-361f-47bd-9e8d-5dac38189fcb/subfolders");
+//                 const folderData = await Promise.all(
+//                     resp.data.payload.map(async (folder: any) => {
+//                         const response = await DamService.get(`folders/${folder.id}/subfolders`);
+//                         const subFolders = await Promise.all(
+//                             response.data.payload.map(async (subFolder: any) => {
+//                                 const assetsResp = await DamService.get(`categories/${subFolder.id}/assets`);
+//                                 const image = assetsResp.data.payload.assets[0].media.small;
+//                                 const blobResponse = await damBlobService.get(image, { responseType: "blob" });
+//                                 const firstImage = URL.createObjectURL(blobResponse.data);
+//                                 const keywordsArrays = assetsResp.data.payload.assets.map(
+//                                     (asset: any) => asset.keywords
+//                                 );
+//                                 const keywords = Array.from(new Set(keywordsArrays.flat())) as string[];
+//                                 return {
+//                                     folderId: subFolder.id,
+//                                     folderName: subFolder.name,
+//                                     assets: assetsResp.data.payload.assets,
+//                                     firstImage,
+//                                     keywords,
+//                                 };
+//                             })
+//                         );
+//                         return { authorName: folder.name, subFolders };
+//                     })
+//                 );
+//                 setFolders(folderData);
+//                 setStartIndices(new Array(folderData.length).fill(0));
+//             } catch (error) {
+//                 console.error("Error fetching data:", error);
+//             } finally {
+//                 setLoading(false);
+//             }
+//         };
+//         fetchData();
+//     }, []);
+//
+//     return (
+//         <div style={{ padding: "20px", background: "black", color: "white" }}>
+//             {/* Header */}
+//             <div style={{ display: "flex", alignItems: "center" }}>
+//                 <div style={{ flex: 1 }}>
+//                     <h1 style={{ color: "white" }}>Featured Albums</h1>
+//                     <h2 style={{ color: "white" }}>Select one of the following folders to view images.</h2>
+//                 </div>
+//                 <Button
+//                     style={{ background: "white", color: "black", height: "40px" }}
+//                     onClick={() => window.location.assign("/")}
+//                 >
+//                     Back to art wall
+//                 </Button>
+//             </div>
+//
+//             {/* Main Content */}
+//             {loading ? (
+//                 <div style={{ marginTop: "30px", textAlign: "center" }}>
+//                     <Skeleton height={200} />
+//                 </div>
+//             ) : (
+//                 <div>
+//                     <Autocomplete
+//                         freeSolo
+//                         options={[]}
+//                         renderInput={(params) => (
+//                             <AppInputBox
+//                                 {...params}
+//                                 placeholder="Search Keywords"
+//                                 onChange={(e) => setKeywordSearch(e.target.value)}
+//                             />
+//                         )}
+//                     />
+//                     {fuzzySearchFolders(folders, keywordSearch).map((folder, folderIndex) => {
+//                         const startIndex = startIndices[folderIndex];
+//                         const endIndex = startIndex + pageSize;
+//                         return (
+//                             <div key={folder.authorName} style={{ marginTop: "30px" }}>
+//                                 <h2>{folder.authorName}</h2>
+//                                 <div style={{ display: "flex", overflowX: "auto", gap: "10px" }}>
+//                                     <IconButton onClick={() => handlePrev(folderIndex)}>
+//                                         <ArrowCircleLeftSharpIcon />
+//                                     </IconButton>
+//                                     {folder.subFolders.slice(startIndex, endIndex).map((subFolder) => (
+//                                         <div
+//                                             key={subFolder.folderId}
+//                                             onClick={() => handleSubfolderClick(subFolder)}
+//                                             style={{ cursor: "pointer" }}
+//                                         >
+//                                             <img src={subFolder.firstImage} alt={subFolder.folderName} />
+//                                             <h4>{subFolder.folderName}</h4>
+//                                         </div>
+//                                     ))}
+//                                     <IconButton onClick={() => handleNext(folderIndex, folder)}>
+//                                         <ArrowCircleRightSharpIcon />
+//                                     </IconButton>
+//                                 </div>
+//                             </div>
+//                         );
+//                     })}
+//                 </div>
+//             )}
+//         </div>
+//     );
+// }
