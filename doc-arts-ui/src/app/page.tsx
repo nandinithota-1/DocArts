@@ -498,6 +498,7 @@ export default function Home() {
                                 marginTop: "10px",
                                 background: "#577C9A",
                                 color: "white",
+                                fontWeight: "bold",
                                 boxShadow: "10px 10px 10px rgba(0, 0, 0, 0.4)", // Corrected syntax
                             }}
                             variant={"contained"}
@@ -515,21 +516,28 @@ export default function Home() {
 
             <Button
                 style={{
-                    background: "#577C9A",
+                    background: "#5f88b9",
                     position: "absolute",
-                    bottom: "25px",
-                    right: "25px",
+                    bottom: "50px",
+                    height: "50px",
+                    fontSize: "15px",
+                    right: "30px",
                     color: "white",
-                    boxShadow: "15px 15px 15px rgba(0, 0, 0, 0.4)", // Corrected syntax
+                    width: "200px",
+                    border: "2px solid white",
+
+                    fontWeight: "bold", // Bold text
+                    boxShadow: "15px 15px 15px rgba(0, 0, 0, 0.4)", // Maintains shadow
                 }}
                 startIcon={<SearchIcon />}
                 onClick={() => {
                     window.location.assign("/featured-albums");
                 }}
-                variant={"contained"}
+                variant="contained"
             >
                 Explore More
             </Button>
+
         </div>
     );
 }
