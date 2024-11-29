@@ -1,3 +1,4 @@
+
 // 'use client'
 // import React, { useEffect, useState, useRef } from 'react';
 // import axios from 'axios';
@@ -277,7 +278,7 @@ export default function Home() {
     const [assets, setAssets] = useState<any[]>([]);
     const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
 
     const generateAuthUrl = () => {
         const authUrl = new URL(process.env.NEXT_PUBLIC_MEDIAVALET_AUTH_ENDPOINT! + process.env.NEXT_PUBLIC_MEDIAVALET_CONNECT!);
@@ -422,12 +423,12 @@ export default function Home() {
             }
         };
 
-        if (containerRef.current) {
+        if (containerRef && containerRef.current) {
             containerRef.current.addEventListener("scroll", handleScroll);
         }
 
         return () => {
-            if (containerRef.current) {
+            if (containerRef && containerRef.current) {
                 containerRef.current.removeEventListener("scroll", handleScroll);
             }
         };
