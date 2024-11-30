@@ -4,7 +4,7 @@ import {alpha, InputBase} from "@mui/material";
 // colors.js
 
 const Colors = {
-    primary: '#18A0FB',         // Primary color for buttons and other UI elements
+    primary: '#D6E2EB',         // Primary color for buttons and other UI elements
     primaryHover: '#1672C4',    // Hover state for primary color
     primaryActive: '#145B99',   // Active state for primary color
     accent: '#F1C0A4',          // Accent color for special actions
@@ -12,7 +12,7 @@ const Colors = {
     accentActive: '#BF8E75',    // Active state for accent color
     secondary: '#FFFFFF',       // Secondary color (e.g., text on buttons)
     background: '#F2F5FA',      // Background color for main containers
-    textPrimary: '#fff',     // Primary text color
+    textPrimary: '#D6E2EB',     // Primary text color
     textSecondary: '#14213D',   // Secondary text color
 };
 
@@ -48,7 +48,7 @@ export const AppInputBox = styled(InputBase)(({theme}) => ({
             '"Segoe UI Symbol"',
         ].join(','),
         '&:focus': {
-            boxShadow: `${alpha(Colors.primaryHover, 0.25)} 0 0 0 0.2rem`,
+            boxShadow: `${alpha(Colors.primaryHover, 0.25)} 0 4 8 0.2rem`,
             borderColor: '1px solid #FCA311',
         },
     },
