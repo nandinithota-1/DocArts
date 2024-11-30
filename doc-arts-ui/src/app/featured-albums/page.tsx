@@ -126,7 +126,7 @@ export default function FeaturedAlbums() {
                         color: "black",
                         height: "40px",
                         boxShadow: "10px 10px 10px rgba(0, 0, 0, 0.4)",
-
+                        ///comment
                     }}
                     onClick={() => window.location.assign("/")}
                 >
