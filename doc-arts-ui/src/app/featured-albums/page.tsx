@@ -114,18 +114,19 @@ export default function FeaturedAlbums() {
     }, []);
 
     return (
-        <div style={{ padding: "20px", background: "#152238", color: "white", height: "100vh" }}>
+        <div style={{ padding: "20px", background: "#152238", color: "white", height: "250vh" }}>
             <div style={{ display: "flex", alignItems: "center" }}>
                 <div style={{ flex: 1 }}>
-                    <h1 style={{ color: "white", fontFamily: "'Roboto', sans-serif" }}>Featured Albums</h1>
-                    <h2 style={{ color: "white", fontFamily: "'Roboto', sans-serif" }}>Select one of the following folders to view images.</h2>
+                    <h1 style={{ color: "#e4edf5", fontFamily: "'Open Sans', sans-serif" }}>Featured Albums</h1>
+                    <h2 style={{ color: "#e4edf5", fontFamily: "'Open Sans', sans-serif" }}>Select one of the following folders to view images</h2>
                 </div>
                 <Button
                     style={{
-                        background: "#577C9A",
-                        color: "white",
+                        background: "#e4edf5",
+                        color: "black",
                         height: "40px",
                         boxShadow: "10px 10px 10px rgba(0, 0, 0, 0.4)",
+                        ///comment
                     }}
                     onClick={() => window.location.assign("/")}
                 >
@@ -145,6 +146,7 @@ export default function FeaturedAlbums() {
                             style={{
                                 paddingRight: "40px",
                                 marginTop: "25px",
+                                color: "819EB7",
                             }}
                             placeholder={"Search Keywords"}
                             onChange={(event: any) => {
@@ -189,7 +191,7 @@ export default function FeaturedAlbums() {
                                         }}
                                     >
                                         <IconButton onClick={() => handlePrev(folderIndex, folder)}>
-                                            <ArrowCircleLeftSharpIcon style={{ color: "white" }} />
+                                            <ArrowCircleLeftSharpIcon style={{ color: "D6E2EB" }} />
                                         </IconButton>
 
                                         {folder.subFolders.length > pageSize ? (
@@ -202,28 +204,38 @@ export default function FeaturedAlbums() {
                                                         key={subFolder.folderId}
                                                         onClick={() => handleSubfolderClick(subFolder)}
                                                         style={{
-                                                            width: "300px",
+                                                            /*width: "300px",
                                                             padding: "20px",
                                                             border: "white 2px solid",
                                                             borderRadius: "10px",
                                                             flex: "0 0 auto",
-                                                            cursor: "pointer",
+                                                            cursor: "pointer",*/
+                                                            width: "300px",
+                                                            height: "350px", // Set a height to make it a box
+                                                            padding: "20px",
+                                                            border: "#819EB7", // Add a white border
+                                                            borderRadius: "10px", // Rounded corners
+                                                            cursor: "pointer", // Make it clickable
+                                                            backgroundColor: "#e4edf5", // Optional background color to make it visible
+                                                            boxShadow: "10px 10px 10px rgba(0, 0, 0, 0.4)",
+                                                            //opacity: 0.7,
+
                                                         }}
                                                     >
                                                         <img
                                                             src={subFolder.firstImage}
                                                             alt={subFolder.folderName}
                                                             height={250}
-                                                            width={250}
+                                                            width={260}
                                                             style={{
                                                                 objectFit: "cover",
                                                                 objectPosition: "top left",
-                                                                borderRadius: "5px",
+                                                                borderRadius: "10px",
                                                             }}
                                                         />
                                                         <Box sx={{ pt: 0.5 }}>
-                                                            <h4 style={{ color: "white" }}>{subFolder.folderName}</h4>
-                                                            <h5 style={{ color: "white" }}>
+                                                            <h4 style={{ color: "#152238", fontFamily: "'Open Sans', sans-serif" }}>{subFolder.folderName}</h4>
+                                                            <h5 style={{ color: "#152238", fontFamily: "'Open Sans', sans-serif" }}>
                                                                 {subFolder.assets.length} images
                                                             </h5>
                                                         </Box>
@@ -237,28 +249,37 @@ export default function FeaturedAlbums() {
                                                     key={subFolder.folderId}
                                                     onClick={() => handleSubfolderClick(subFolder)}
                                                     style={{
-                                                        width: "300px",
+                                                        /*width: "300px",
                                                         padding: "20px",
                                                         border: "white 2px solid",
                                                         borderRadius: "10px",
                                                         flex: "0 0 auto",
-                                                        cursor: "pointer",
+                                                        cursor: "pointer",*/
+                                                        width: "300px",
+                                                        height: "350px", // Set a height to make it a box
+                                                        padding: "20px",
+                                                        border: "2px solid white", // Add a white border
+                                                        borderRadius: "10px", // Rounded corners
+                                                        cursor: "pointer", // Make it clickable
+                                                        backgroundColor: "#e4edf5", // Optional background color to make it visible
+                                                        boxShadow: "10px 10px 10px rgba(0, 0, 0, 0.4)",
                                                     }}
                                                 >
                                                     <img
                                                         src={subFolder.firstImage}
                                                         alt={subFolder.folderName}
                                                         height={250}
-                                                        width={250}
+                                                        width={260}
                                                         style={{
                                                             objectFit: "cover",
                                                             objectPosition: "top left",
-                                                            borderRadius: "5px",
+                                                            borderRadius: "10px",
+                                                            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.3)",  // Add shadow here
                                                         }}
                                                     />
                                                     <Box sx={{ pt: 0.5 }}>
-                                                        <h4 style={{ color: "white" }}>{subFolder.folderName}</h4>
-                                                        <h5 style={{ color: "white" }}>
+                                                        <h4 style={{ color: "#152238" }}>{subFolder.folderName}</h4>
+                                                        <h5 style={{ color: "#152238" }}>
                                                             {subFolder.assets.filter((asset) =>
                                                                 asset.keywords.some((keyword: string) => keyword.toLowerCase().includes(keywordSearch.toLowerCase()))
                                                             ).length}{" "}
@@ -270,7 +291,7 @@ export default function FeaturedAlbums() {
                                         )}
 
                                         <IconButton onClick={() => handleNext(folderIndex, folder)}>
-                                            <ArrowCircleRightSharpIcon style={{ color: "white" }} />
+                                            <ArrowCircleRightSharpIcon style={{ color: "D6E2EB" }} />
                                         </IconButton>
                                     </div>
                                 </div>
@@ -281,7 +302,7 @@ export default function FeaturedAlbums() {
                 ) : (
                     <h2
                         style={{
-                            color: "white",
+                            color: "D6E2EB",
                             marginTop: "15px",
                             display: "flex",
                             justifyContent: "center",

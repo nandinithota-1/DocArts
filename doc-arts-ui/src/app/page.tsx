@@ -491,15 +491,16 @@ export default function Home() {
                             paddingTop: "25vh",
                         }}
                     >
-                        <h1 style={{ color: "white" }}>
+                        <h1 style={{ color: "#e4edf5", fontFamily: "'Open Sans', sans-serif" }}>
                             Welcome to UTD DocArts Project!<br /> Please click the button below to start ⬇️
                         </h1>
                         <Button
                             style={{
+                                fontFamily: "'Open Sans', sans-serif",
                                 marginTop: "10px",
-                                background: "#577C9A",
-                                color: "white",
-                                fontWeight: "bold",
+                                background: "#e4edf5",
+                                color: "#152238",
+                                //fontWeight: "bold",
                                 boxShadow: "10px 10px 10px rgba(0, 0, 0, 0.4)", // Corrected syntax
                             }}
                             variant={"contained"}
@@ -517,17 +518,18 @@ export default function Home() {
 
             <Button
                 style={{
-                    background: "#5f88b9",
+                    fontFamily : "'Open Sans', sans-serif",
+                    background: "#e4edf5",
                     position: "absolute",
                     bottom: "50px",
                     height: "50px",
                     fontSize: "15px",
                     right: "30px",
-                    color: "white",
+                    color: "#152238",
                     width: "200px",
-                    border: "2px solid white",
+                    border: "2px #e4edf5",
 
-                    fontWeight: "bold", // Bold text
+                    //fontWeight: "bold", // Bold text
                     boxShadow: "15px 15px 15px rgba(0, 0, 0, 0.4)", // Maintains shadow
                 }}
                 startIcon={<SearchIcon />}
