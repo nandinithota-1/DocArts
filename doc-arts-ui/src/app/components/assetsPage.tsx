@@ -199,6 +199,7 @@ import React, { useEffect, useState } from "react";
 import DamService from "@/app/services/damService";
 import { Box, Button, Grid, Skeleton, TextField, Typography } from "@mui/material";
 import Modal from "@mui/material/Modal";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 interface Asset {
     id: string;
@@ -291,20 +292,22 @@ export const AssetsPage = ({ id }: { id: string }) => {
     }, [searchTerm, assets]);
 
     return (
-        <div style={{ padding: "20px", backgroundColor: "#152238", color: "white" }}>
+        <div style={{ padding: "20px", backgroundColor: "#152238", color: "D6E2EB" }}>
             <Button
                 onClick={() => window.location.assign("/featured-albums")}
                 style={{
-                    backgroundColor: "#577C9A",
-                    color: "white",
+                    fontFamily: "'Open Sans', sans-serif",
+                    backgroundColor: "#e4edf5",
+                    color: "#152238",
                     marginBottom: "20px",
-                    padding: "10px 20px",
-                    borderRadius: "5px",
+                    padding: "10px 10px",
+                    borderRadius: "10px",
                     border: "none",
                     cursor: "pointer",
+                    boxShadow: "10px 10px 10px rgba(0, 0, 0, 0.4)",
                 }}
             >
-                Back to Featured Albums
+                <ArrowBackIcon /> Back to Featured Albums
             </Button>
 
             {/* Album Name */}
@@ -314,7 +317,7 @@ export const AssetsPage = ({ id }: { id: string }) => {
                     marginBottom: "20px",
                     marginTop: "0px",
                     textAlign: "center",
-                    color: "white",
+                    color: "#e4edf5",
                     fontSize: "2rem", // Larger font size for emphasis
                     letterSpacing: "1px", // Adds slight spacing between letters
                     lineHeight: "1", // Ensures proper spacing between lines if album name is long
@@ -329,7 +332,7 @@ export const AssetsPage = ({ id }: { id: string }) => {
                     placeholder="Search assets"
                     value={searchTerm || ""}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{ marginRight: "10px", backgroundColor: "white", borderRadius: "5px", width: "100%" }}
+                    style={{ marginRight: "10px", backgroundColor: "#e4edf5", borderRadius: "5px", width: "100%" }}
                 />
             </div>
 
@@ -341,7 +344,7 @@ export const AssetsPage = ({ id }: { id: string }) => {
                             variant="rectangular"
                             height={"250px"}
                             width={"400px"}
-                            sx={{ backgroundColor: "dimgray", margin: "1px" }}
+                            sx={{ backgroundColor: "light blue", margin: "1px" }}
                         />
                     ))}
                 </Grid>
@@ -442,12 +445,13 @@ export const AssetsPage = ({ id }: { id: string }) => {
                             {/* Back of the modal card */}
                             <div
                                 style={{
+                                    fontFamily: "'Open Sans', sans-serif",
                                     position: "absolute",
                                     top: 0,
                                     left: 0,
                                     width: "100%",
                                     height: "100%",
-                                    backgroundColor: "black", // Black background
+                                    backgroundColor: "#152238", // Black background
                                     backfaceVisibility: "hidden",
                                     transform: "rotateY(180deg)",
                                     display: "flex", // Flexbox for centering
